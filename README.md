@@ -1,12 +1,5 @@
 # ldapauthenticator
 
-[![TravisCI (.com) build status](https://img.shields.io/travis/com/jupyterhub/ldapauthenticator/master?logo=travis)](https://travis-ci.com/jupyterhub/ldapauthenticator)
-[![Latest PyPI version](https://img.shields.io/pypi/v/jupyterhub-ldapauthenticator?logo=pypi)](https://pypi.python.org/pypi/jupyterhub-ldapauthenticator)
-[![Latest conda-forge version](https://img.shields.io/conda/vn/conda-forge/jupyterhub-ldapauthenticator?logo=conda-forge)](https://anaconda.org/conda-forge/jupyterhub-ldapauthenticator)
-[![GitHub](https://img.shields.io/badge/issue_tracking-github-blue?logo=github)](https://github.com/jupyterhub/ldapauthenticator/issues)
-[![Discourse](https://img.shields.io/badge/help_forum-discourse-blue?logo=discourse)](https://discourse.jupyter.org/c/jupyterhub)
-[![Gitter](https://img.shields.io/badge/social_chat-gitter-blue?logo=gitter)](https://gitter.im/jupyterhub/jupyterhub)
-
 Simple LDAP Authenticator Plugin for JupyterHub
 
 ## Installation ##
@@ -14,13 +7,8 @@ Simple LDAP Authenticator Plugin for JupyterHub
 You can install it from pip with:
 
 ```
-pip install jupyterhub-ldapauthenticator
+pip install git+https://github.com/ixtora/ldapauthenticator.git
 ```
-...or using conda with:
-```
-conda install -c conda-forge jupyterhub-ldapauthenticator
-```
-
 
 ## Logging people out ##
 

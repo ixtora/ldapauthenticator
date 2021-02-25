@@ -304,6 +304,40 @@ class LDAPAuthenticator(Authenticator):
 
         return (user_dn, response[0]["dn"])
 
+    def resolve_group(self, userdn, username):
+        search_dn = self.lookup_dn_search_user
+        if self.escape_userdn:
+            search_dn = escape_filter_chars(search_dn)
+        conn = self.get_connection(
+            userdn=search_dn, password=self.lookup_dn_search_password
+        )
+        is_bound = conn.bind()
+        if not is_bound:
+            msg = "Failed to connect to LDAP server with search user '{search_dn}'"
+            self.log.warning(msg.format(search_dn=search_dn))
+            return (None, None)
+
+        found = False
+        for group in self.allowed_groups:
+            group_filter = (
+                "(|"
+                "(member={userdn})"
+                "(uniqueMember={userdn})"
+                "(memberUid={uid})"
+                ")"
+            )
+            group_filter = group_filter.format(userdn=userdn, uid=username)
+            group_attributes = ["member", "uniqueMember", "memberUid"]
+            found = conn.search(
+                group,
+                search_scope=ldap3.BASE,
+                search_filter=group_filter,
+                attributes=group_attributes,
+            )
+            if found:
+                break
+        return found
+
     def get_connection(self, userdn, password):
         server = ldap3.Server(
             self.server_address, port=self.server_port, use_ssl=self.use_ssl
@@ -429,25 +463,7 @@ class LDAPAuthenticator(Authenticator):
 
         if self.allowed_groups:
             self.log.debug("username:%s Using dn %s", username, userdn)
-            found = False
-            for group in self.allowed_groups:
-                group_filter = (
-                    "(|"
-                    "(member={userdn})"
-                    "(uniqueMember={userdn})"
-                    "(memberUid={uid})"
-                    ")"
-                )
-                group_filter = group_filter.format(userdn=userdn, uid=username)
-                group_attributes = ["member", "uniqueMember", "memberUid"]
-                found = conn.search(
-                    group,
-                    search_scope=ldap3.BASE,
-                    search_filter=group_filter,
-                    attributes=group_attributes,
-                )
-                if found:
-                    break
+            found = self.resolve_group(userdn, username)
             if not found:
                 # If we reach here, then none of the groups matched
                 msg = "username:{username} User not in any of the allowed groups"
